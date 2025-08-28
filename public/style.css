@@ -52,10 +52,10 @@ summary:hover { background: #2a2a2a; }
 details[open] > summary { background: #333; color: #fff; }
 
 /* === List levels === */
-ul { list-style: none; margin: 2px 0; padding: 0;  color: rgb(28, 251, 121);}
-ul.level-1 { border-right: 3px solid #4cafef; margin-right: 8px; padding-right: 8px; color: rgba(28, 251, 121, 0.692);}
-ul.level-2 { border-right: 2px dashed #888; margin-right: 18px; padding-right: 8px;  color: rgba(28, 251, 121, 0.527); }
-ul.level-3 { border-right: 1px dotted #666; margin-right: 28px; padding-right: 8px; color: rgba(28, 251, 121, 0.349);}
+ul { list-style: none; margin: 2px 0; padding: 0;  }
+ul.level-1 { border-right: 3px solid #4cafef; margin-right: 8px; padding-right: 8px; }
+ul.level-2 { border-right: 2px dashed #888; margin-right: 18px; padding-right: 8px;  }
+ul.level-3 { border-right: 1px dotted #666; margin-right: 28px; padding-right: 8px; }
 
 li {
   font-size: 13px;
