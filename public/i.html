@@ -30,8 +30,6 @@
     details {
       margin: 3px 0;
       transition: all 0.3s ease;
-      border-bottom: 1px solid #2a2a2a;
-      padding-bottom: 4px;
     }
     summary {
       cursor: pointer;
@@ -45,15 +43,16 @@
     }
     summary:hover { background: #2a2a2a; }
     details[open] > summary { background: #333; color: #fff; }
-    /* Level styles */
-    ul { list-style: none; margin: 2px 0; padding: 0; }
-    ul.level-1 { border-right: 3px solid #4cafef; margin-right: 8px; padding-right: 8px; }
-    ul.level-2 { border-right: 2px dashed #888; margin-right: 18px; padding-right: 8px; }
-    ul.level-3 { border-right: 1px dotted #666; margin-right: 28px; padding-right: 8px; }
+    ul {
+      list-style: none;
+      margin: 2px 0 2px 15px;
+      padding: 0 0 0 10px;
+      border-right: 1px solid #333;
+    }
     li {
       font-size: 14px;
       margin: 2px 0;
-      padding: 3px 6px;
+      padding: 2px 6px;
       border-radius: 4px;
       display: flex;
       justify-content: space-between;
@@ -68,17 +67,6 @@
       margin-left: 8px;
     }
     .edit-icon:hover { color: #fff; }
-    .node-icon {
-      margin-left: 6px;
-      font-size: 16px;
-      color: #4cafef;
-    }
-    .divider {
-      height: 2px;
-      background: #2c2c2c;
-      margin: 8px 0;
-      border-radius: 2px;
-    }
     /* Modal */
     .modal {
       position: fixed; top: 0; left: 0;
@@ -146,10 +134,10 @@
       const data = await res.json();
       const container = document.getElementById("tree");
 
-      function createNode(title, children, level=1) {
+      function createNode(title, children) {
         const details = document.createElement("details");
         const summary = document.createElement("summary");
-        summary.innerHTML = `<span><span class="iconify node-icon" data-icon="${level===1?'mdi:folder':'mdi:file-document'}"></span>${title}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
+        summary.innerHTML = `<span>${title}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
         
         summary.querySelector(".edit-icon").onclick = (e) => {
           e.stopPropagation(); openModal(title);
@@ -159,37 +147,27 @@
 
         if (Array.isArray(children)) {
           const ul = document.createElement("ul");
-          ul.classList.add(`level-${level}`);
           children.forEach(v => {
             const li = document.createElement("li");
-            li.innerHTML = `<span><span class="iconify node-icon" data-icon="mdi:subdirectory-arrow-right"></span>${v}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
+            li.innerHTML = `<span>${v}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
             li.querySelector(".edit-icon").onclick = (e) => {
-              e.stopPropagation();
-              openModal(v);
+              e.stopPropagation(); openModal(v);
             };
             ul.appendChild(li);
           });
           details.appendChild(ul);
         } else if (typeof children === "object") {
           const ul = document.createElement("ul");
-          ul.classList.add(`level-${level}`);
           for (const [subTitle, subChildren] of Object.entries(children)) {
-            ul.appendChild(createNode(subTitle, subChildren, level+1));
+            ul.appendChild(createNode(subTitle, subChildren));
           }
           details.appendChild(ul);
         }
         return details;
       }
 
-      let first = true;
       for (const [group, sub] of Object.entries(data)) {
-        if (!first) {
-          const divider = document.createElement("div");
-          divider.className = "divider";
-          container.appendChild(divider);
-        }
-        first = false;
-        container.appendChild(createNode(group, sub, 1));
+        container.appendChild(createNode(group, sub));
       }
     }
 
