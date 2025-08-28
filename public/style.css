@@ -1,0 +1,164 @@
+/* === Base === */
+* {
+  font-family: 'Vazirmatn', sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  background: #121212;
+  color: #eaeaea;
+  margin: 0;
+  padding: 10px;
+  line-height: 1.5;
+}
+
+h1 {
+  text-align: center;
+  font-size: 22px;
+  margin: 8px 0 16px;
+  color: #fff;
+}
+
+/* === Tree container === */
+.tree {
+  max-width: 900px;
+  margin: auto;
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  overflow-x: auto; /* prevents breaking on mobile */
+}
+
+/* === Details & Summary === */
+details {
+  margin: 3px 0;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #2a2a2a;
+  padding-bottom: 4px;
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  word-break: break-word;
+}
+summary:hover { background: #2a2a2a; }
+details[open] > summary { background: #333; color: #fff; }
+
+/* === List levels === */
+ul { list-style: none; margin: 2px 0; padding: 0; }
+ul.level-1 { border-right: 3px solid #4cafef; margin-right: 8px; padding-right: 8px; }
+ul.level-2 { border-right: 2px dashed #888; margin-right: 18px; padding-right: 8px; }
+ul.level-3 { border-right: 1px dotted #666; margin-right: 28px; padding-right: 8px; }
+
+li {
+  font-size: 13px;
+  margin: 2px 0;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.25s;
+  word-break: break-word;
+}
+li:hover { background: #2a2a2a; }
+
+/* === Icons === */
+.node-icon { margin-left: 6px; font-size: 14px; color: #4cafef; }
+.edit-icon { font-size: 14px; color: #aaa; cursor: pointer; margin-left: 6px; }
+.edit-icon:hover { color: #fff; }
+
+/* Divider */
+.divider {
+  height: 2px;
+  background: #2c2c2c;
+  margin: 8px 0;
+  border-radius: 2px;
+}
+
+/* === Modal === */
+.modal {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #1e1e1e;
+  padding: 16px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
+  animation: popIn 0.3s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-content h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #fff;
+}
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+}
+.modal-content button {
+  padding: 8px 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-primary { background: #4cafef; color: #fff; }
+.btn-secondary { background: #555; color: #fff; margin-right: 8px; }
+
+/* === Toast === */
+.toast {
+  position: fixed; bottom: 10px; right: 10px;
+  background: #333; color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.5s, transform 0.5s;
+  transform: translateY(20px);
+  z-index: 1100;
+  font-size: 13px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* === Responsive tweaks === */
+@media (max-width: 768px) {
+  h1 { font-size: 20px; }
+  .tree { padding: 8px; }
+  summary { font-size: 13px; }
+  li { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 6px; }
+  h1 { font-size: 18px; }
+  .tree { border-radius: 6px; padding: 6px; }
+  summary { font-size: 12px; padding: 4px; }
+  li { font-size: 11px; padding: 3px; }
+  .modal-content { width: 95%; padding: 12px; }
+  .modal-content h2 { font-size: 14px; }
+  .modal-content input { font-size: 13px; }
+  .btn-primary, .btn-secondary { font-size: 13px; padding: 6px 10px; }
+}
