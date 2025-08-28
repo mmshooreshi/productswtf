@@ -1,4 +1,5 @@
-import fetch from "node-fetch";
+// ❌ remove this line
+// import fetch from "node-fetch";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -25,11 +26,12 @@ export default async function handler(req, res) {
     );
 
     if (resp.ok) {
-      res.status(200).json({ success: true });
+      return res.status(200).json({ success: true });
     } else {
-      res.status(500).json({ success: false, message: "Telegram API error" });
+      return res.status(500).json({ success: false, message: "Telegram API error" });
     }
   } catch (err) {
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Server error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 }
