@@ -95,8 +95,8 @@
       background: #1e1e1e;
       padding: 20px;
       border-radius: 10px;
-      /* width: 380px; */
-      width: max-content; 
+      width: 300px;
+      /* width: max-content;  */
       max-width: 90%; 
       box-shadow: 0 0 20px rgba(0,0,0,0.8);
       animation: popIn 0.3s ease;
@@ -104,7 +104,11 @@
     @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .modal-content h2 { margin: 0 0 10px; font-size: 18px; color: #fff; }
     .modal-content input {
-      width: 100%; padding: 8px; margin: 10px 0;
+      /* width: 100%;  */
+      width: -webkit-fill-available;
+      
+      padding: 8px; 
+      margin: 10px 0;
       border: 1px solid #444; border-radius: 6px;
       background: #2a2a2a; color: #fff;
     }
