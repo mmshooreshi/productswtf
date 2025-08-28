@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>چاپ و بسته‌بندی</title>
+  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: #121212;
+      color: #eaeaea;
+      margin: 0;
+      padding: 15px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin: 10px 0 20px;
+      color: #fff;
+    }
+    .tree {
+      max-width: 900px;
+      margin: auto;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    details {
+      margin: 3px 0;
+      transition: all 0.3s ease;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary:hover { background: #2a2a2a; }
+    details[open] > summary { background: #333; color: #fff; }
+    ul {
+      list-style: none;
+      margin: 2px 0 2px 15px;
+      padding: 0 0 0 10px;
+      border-right: 1px solid #333;
+    }
+    li {
+      font-size: 14px;
+      margin: 2px 0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.25s;
+    }
+    li:hover { background: #2a2a2a; }
+    .edit-icon {
+      font-size: 16px;
+      color: #aaa;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .edit-icon:hover { color: #fff; }
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      width: 380px; max-width: 90%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-content h2 { margin: 0 0 10px; font-size: 18px; color: #fff; }
+    .modal-content input {
+      width: 100%; padding: 8px; margin: 10px 0;
+      border: 1px solid #444; border-radius: 6px;
+      background: #2a2a2a; color: #fff;
+    }
+    .modal-content button {
+      padding: 8px 12px; margin-top: 10px;
+      border: none; border-radius: 6px; cursor: pointer;
+    }
+    .btn-primary { background: #4cafef; color: #fff; }
+    .btn-secondary { background: #555; color: #fff; margin-right: 8px; }
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #333; color: #fff;
+      padding: 12px 18px; border-radius: 6px;
+      opacity: 0; transition: opacity 0.5s, transform 0.5s;
+      transform: translateY(20px); z-index: 1100;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <h1>🖨 چاپ و 📦 بسته‌بندی</h1>
+  <div class="tree" id="tree"></div>
+
+  <!-- Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h2>ویرایش آیتم</h2>
+      <input type="text" id="editInput">
+      <div>
+        <button class="btn-primary" onclick="submitEdit()">ثبت</button>
+        <button class="btn-secondary" onclick="closeModal()">انصراف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentItem = null;
+
+    async function buildTree() {
+      const res = await fetch("products.json");
+      const data = await res.json();
+      const container = document.getElementById("tree");
+
+      function createNode(title, children) {
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.innerHTML = `<span>${title}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
+        
+        summary.querySelector(".edit-icon").onclick = (e) => {
+          e.stopPropagation(); openModal(title);
+        };
+
+        details.appendChild(summary);
+
+        if (Array.isArray(children)) {
+          const ul = document.createElement("ul");
+          children.forEach(v => {
+            const li = document.createElement("li");
+            li.innerHTML = `<span>${v}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
+            li.querySelector(".edit-icon").onclick = (e) => {
+              e.stopPropagation(); openModal(v);
+            };
+            ul.appendChild(li);
+          });
+          details.appendChild(ul);
+        } else if (typeof children === "object") {
+          const ul = document.createElement("ul");
+          for (const [subTitle, subChildren] of Object.entries(children)) {
+            ul.appendChild(createNode(subTitle, subChildren));
+          }
+          details.appendChild(ul);
+        }
+        return details;
+      }
+
+      for (const [group, sub] of Object.entries(data)) {
+        container.appendChild(createNode(group, sub));
+      }
+    }
+
+    function openModal(item) {
+      currentItem = item;
+      document.getElementById("editInput").value = item;
+      document.getElementById("editModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    async function submitEdit() {
+      const newValue = document.getElementById("editInput").value.trim();
+      closeModal();
+      if (!newValue) return;
+
+      try {
+        const res = await fetch("/api/edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ oldValue: currentItem, newValue })
+        });
+        const result = await res.json();
+        if (result.success) showToast("✅ تغییر ارسال شد");
+        else showToast("❌ خطا در ارسال تغییر");
+      } catch {
+        showToast("❌ ارتباط با سرور ناموفق بود");
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.className = "toast show";
+      setTimeout(() => toast.className = "toast", 3000);
+    }
+
+    buildTree();
+  </script>
+</body>
+</html>
