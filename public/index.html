@@ -142,6 +142,7 @@
     let currentItem = null;
 
     async function buildTree() {
+      console.log("Fetching products.json ...");
       const res = await fetch("products.json");
       const data = await res.json();
       const container = document.getElementById("tree");
@@ -149,11 +150,15 @@
       function createNode(title, children, level=1) {
         const details = document.createElement("details");
         const summary = document.createElement("summary");
-        summary.innerHTML = `<span><span class="iconify node-icon" data-icon="${level===1?'mdi:folder':'mdi:file-document'}"></span>${title}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
-        
-        summary.querySelector(".edit-icon").onclick = (e) => {
-          e.stopPropagation(); openModal(title);
-        };
+        summary.innerHTML = `
+          <span>
+            <span class="iconify node-icon" data-icon="${level===1?'mdi:folder':'mdi:file-document'}"></span>
+            ${title}
+          </span>
+          <span class="edit-icon" data-value="${title}">
+            <span class="iconify" data-icon="mdi:pencil"></span>
+          </span>
+        `;
 
         details.appendChild(summary);
 
@@ -162,11 +167,15 @@
           ul.classList.add(`level-${level}`);
           children.forEach(v => {
             const li = document.createElement("li");
-            li.innerHTML = `<span><span class="iconify node-icon" data-icon="mdi:subdirectory-arrow-right"></span>${v}</span><span class="iconify edit-icon" data-icon="mdi:pencil"></span>`;
-            li.querySelector(".edit-icon").onclick = (e) => {
-              e.stopPropagation();
-              openModal(v);
-            };
+            li.innerHTML = `
+              <span>
+                <span class="iconify node-icon" data-icon="mdi:subdirectory-arrow-right"></span>
+                ${v}
+              </span>
+              <span class="edit-icon" data-value="${v}">
+                <span class="iconify" data-icon="mdi:pencil"></span>
+              </span>
+            `;
             ul.appendChild(li);
           });
           details.appendChild(ul);
@@ -182,23 +191,38 @@
       }
 
       let first = true;
-      for (const [group, sub] of Object.entries(data)) {
-        if (!first) {
+      let groups = Object.entries(data).filter(([k,v]) => v && Object.keys(v).length > 0);
+
+      groups.forEach(([group, sub], index) => {
+        if (index > 0) {
           const divider = document.createElement("div");
           divider.className = "divider";
           container.appendChild(divider);
         }
-        first = false;
         container.appendChild(createNode(group, sub, 1));
-      }
+      });
+
     }
+
+    // Event delegation for edit icons
+    document.addEventListener("click", (e) => {
+      const icon = e.target.closest(".edit-icon");
+      if (icon) {
+        e.stopPropagation();
+        const val = icon.getAttribute("data-value");
+        console.log("Edit icon clicked for:", val);
+        openModal(val);
+      }
+    });
 
     function openModal(item) {
       currentItem = item;
+      console.log("Opening modal for:", item);
       document.getElementById("editInput").value = item;
       document.getElementById("editModal").style.display = "flex";
     }
     function closeModal() {
+      console.log("Closing modal");
       document.getElementById("editModal").style.display = "none";
     }
 
@@ -207,6 +231,8 @@
       closeModal();
       if (!newValue) return;
 
+      console.log("Submitting edit:", { oldValue: currentItem, newValue });
+
       try {
         const res = await fetch("/api/edit", {
           method: "POST",
@@ -214,9 +240,11 @@
           body: JSON.stringify({ oldValue: currentItem, newValue })
         });
         const result = await res.json();
+        console.log("Server response:", result);
         if (result.success) showToast("✅ تغییر ارسال شد");
         else showToast("❌ خطا در ارسال تغییر");
-      } catch {
+      } catch (err) {
+        console.error("Submit failed:", err);
         showToast("❌ ارتباط با سرور ناموفق بود");
       }
     }
@@ -225,6 +253,7 @@
       const toast = document.getElementById("toast");
       toast.textContent = msg;
       toast.className = "toast show";
+      console.log("Toast:", msg);
       setTimeout(() => toast.className = "toast", 3000);
     }
 
