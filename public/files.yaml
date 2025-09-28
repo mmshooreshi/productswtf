@@ -1,0 +1,10 @@
+files:
+  - id: products
+    name: محصولات
+    path: products.json
+  - id: products-prev
+    name: previous products
+    path: products-prev.json
+  - id: specific-products
+    name: specific products
+    path: specific-products.json
